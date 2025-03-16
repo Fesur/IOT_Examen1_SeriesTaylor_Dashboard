@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Series Trigonométricas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- MathJax para fórmulas matemáticas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="container py-4">
+        <header class="pb-3 mb-4 border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+                    <span class="fs-4">Calculadora de Series Trigonométricas</span>
+                </a>
+                <a href="/dashboard" class="btn btn-outline-primary">Ver Dashboard</a>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Calculadora</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="calculator-form">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nombre de usuario:</label>
+                                <input type="text" class="form-control" id="username" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de serie:</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="series_type" id="series-sin" value="sin" checked>
+                                    <label class="form-check-label" for="series-sin">
+                                        Seno (sin)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="series_type" id="series-cos" value="cos">
+                                    <label class="form-check-label" for="series-cos">
+                                        Coseno (cos)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="series_type" id="series-tan" value="tan">
+                                    <label class="form-check-label" for="series-tan">
+                                        Tangente (tan)
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="x-value" class="form-label">Valor de x (en radianes):</label>
+                                <input type="number" step="0.1" class="form-control" id="x-value" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="n-terms" class="form-label">Número de términos:</label>
+                                <input type="number" min="1" step="1" class="form-control" id="n-terms" required>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Calcular</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Resultado</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="result-container" class="d-none">
+                            <div class="alert alert-info">
+                                <h5 class="alert-heading">Resultado del cálculo:</h5>
+                                <hr>
+                                <p><strong>Serie:</strong> <span id="result-series-type"></span></p>
+                                <p><strong>Valor x:</strong> <span id="result-x-value"></span></p>
+                                <p><strong>Términos:</strong> <span id="result-n-terms"></span></p>
+                                <p><strong>Aproximación:</strong> <span id="result-approx"></span></p>
+                                <p><strong>Valor exacto:</strong> <span id="result-exact"></span></p>
+                                <p><strong>Error:</strong> <span id="result-error"></span></p>
+                            </div>
+                        </div>
+                        
+                        <div id="error-container" class="d-none">
+                            <div class="alert alert-danger">
+                                <h5 class="alert-heading">Error en el cálculo</h5>
+                                <hr>
+                                <p id="error-message"></p>
+                            </div>
+                        </div>
+                        
+                        <div id="loading-container" class="d-none text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Calculando...</span>
+                            </div>
+                            <p class="mt-2">Calculando resultado...</p>
+                        </div>
+                        
+                        <div id="initial-message" class="text-center py-4 text-muted">
+                            <i class="bi bi-arrow-left-circle"></i>
+                            <p>Complete el formulario y haga clic en "Calcular" para ver los resultados.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Fórmulas</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Serie de Taylor para seno:</h6>
+                        <p>\[ \sin(x) = \sum_{n=0}^{\infty} \frac{(-1)^n}{(2n+1)!} x^{2n+1} = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \cdots \]</p>
+                        
+                        <h6>Serie de Taylor para coseno:</h6>
+                        <p>\[ \cos(x) = \sum_{n=0}^{\infty} \frac{(-1)^n}{(2n)!} x^{2n} = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \cdots \]</p>
+                        
+                        <h6>Serie para tangente:</h6>
+                        <p>\[ \tan(x) = \frac{\sin(x)}{\cos(x)} \]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Mis cálculos anteriores</h5>
+                        <button id="refresh-history" class="btn btn-sm btn-outline-secondary">Actualizar</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Serie</th>
+                                        <th>Valor X</th>
+                                        <th>Términos</th>
+                                        <th>Resultado</th>
+                                        <th>Valor Exacto</th>
+                                        <th>Error</th>
+                                        <th>Fecha/Hora</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body"></tbody>
+                            </table>
+                        </div>
+                        <div id="no-history" class="text-center py-3 text-muted">
+                            <p>No hay cálculos previos para mostrar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script personalizado -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del DOM
+            const calculatorForm = document.getElementById('calculator-form');
+            const usernameInput = document.getElementById('username');
+            const resultContainer = document.getElementById('result-container');
+            const errorContainer = document.getElementById('error-container');
+            const loadingContainer = document.getElementById('loading-container');
+            const initialMessage = document.getElementById('initial-message');
+            const historyTableBody = document.getElementById('history-table-body');
+            const noHistoryMessage = document.getElementById('no-history');
+            const refreshHistoryBtn = document.getElementById('refresh-history');
+            
+            // Cargar nombre de usuario desde localStorage si existe
+            if (localStorage.getItem('username')) {
+                usernameInput.value = localStorage.getItem('username');
+                loadUserHistory(usernameInput.value);
+            }
+            
+            // Manejar envío del formulario
+            calculatorForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Obtener valores del formulario
+                const username = usernameInput.value;
+                const seriesType = document.querySelector('input[name="series_type"]:checked').value;
+                const xValue = parseFloat(document.getElementById('x-value').value);
+                const nTerms = parseInt(document.getElementById('n-terms').value);
+                
+                // Guardar username en localStorage
+                localStorage.setItem('username', username);
+                
+                // Mostrar loading, ocultar otros mensajes
+                resultContainer.classList.add('d-none');
+                errorContainer.classList.add('d-none');
+                initialMessage.classList.add('d-none');
+                loadingContainer.classList.remove('d-none');
+                
+                // Realizar cálculo via API
+                fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        series_type: seriesType,
+                        x_value: xValue,
+                        n_terms: nTerms
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Ocultar loading
+                    loadingContainer.classList.add('d-none');
+                    
+                    if (data.status === 'success') {
+                        // Mostrar resultados
+                        document.getElementById('result-series-type').textContent = seriesType;
+                        document.getElementById('result-x-value').textContent = xValue;
+                        document.getElementById('result-n-terms').textContent = nTerms;
+                        document.getElementById('result-approx').textContent = data.result.toExponential(8);
+                        document.getElementById('result-exact').textContent = data.exact_value.toExponential(8);
+                        document.getElementById('result-error').textContent = data.error.toExponential(8);
+                        
+                        resultContainer.classList.remove('d-none');
+                        
+                        // Actualizar historial
+                        loadUserHistory(username);
+                    } else {
+                        // Mostrar error
+                        document.getElementById('error-message').textContent = data.message || 'Error desconocido al realizar el cálculo';
+                        errorContainer.classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    // Ocultar loading y mostrar error
+                    loadingContainer.classList.add('d-none');
+                    document.getElementById('error-message').textContent = 'Error de conexión: ' + error.message;
+                    errorContainer.classList.remove('d-none');
+                });
+            });
+            
+            // Función para cargar historial del usuario
+            function loadUserHistory(username) {
+                fetch(`/api/user_history?username=${encodeURIComponent(username)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.calculations && data.calculations.length > 0) {
+                            historyTableBody.innerHTML = '';
+                            noHistoryMessage.classList.add('d-none');
+                            
+                            data.calculations.forEach(calc => {
+                                const row = document.createElement('tr');
+                                
+                                // Formatear valores
+                                const seriesType = calc[0]; // series_type
+                                const xValue = parseFloat(calc[1]).toFixed(4); // x_value
+                                const nTerms = calc[2]; // n_terms
+                                const result = parseFloat(calc[3]).toExponential(4); // result
+                                const exactValue = parseFloat(calc[4]).toExponential(4); // exact_value
+                                const error = parseFloat(calc[5]).toExponential(4); // error
+                                const time = new Date(calc[6]).toLocaleString(); // time
+                                
+                                // Crear celdas
+                                row.innerHTML = `
+                                    <td>${seriesType}</td>
+                                    <td>${xValue}</td>
+                                    <td>${nTerms}</td>
+                                    <td>${result}</td>
+                                    <td>${exactValue}</td>
+                                    <td>${error}</td>
+                                    <td>${time}</td>
+                                `;
+                                
+                                historyTableBody.appendChild(row);
+                            });
+                        } else {
+                            historyTableBody.innerHTML = '';
+                            noHistoryMessage.classList.remove('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar historial:', error);
+                        historyTableBody.innerHTML = '';
+                        noHistoryMessage.classList.remove('d-none');
+                        noHistoryMessage.textContent = 'Error al cargar el historial: ' + error.message;
+                    });
+            }
+            
+            // Manejar botón de actualizar historial
+            refreshHistoryBtn.addEventListener('click', function() {
+                const username = usernameInput.value;
+                if (username) {
+                    loadUserHistory(username);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

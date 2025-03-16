@@ -1,0 +1,99 @@
+/* Estilos adicionales para el dashboard */
+
+.graph-container {
+    position: relative;
+    min-height: 400px;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+}
+
+.error-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #dc3545;
+    text-align: center;
+    background-color: #f8d7da;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 10px 0;
+}
+
+/* Personalización de tarjetas */
+.card {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+/* Estilos para las pestañas */
+.nav-tabs {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.nav-tabs .nav-link {
+    margin-bottom: -1px;
+    border: 1px solid transparent;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    color: #495057;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.nav-tabs .nav-link.active {
+    color: #007bff;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+/* Estilos para tablas */
+#data-table {
+    width: 100%;
+}
+
+#data-table th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 1;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+    .graph-container {
+        min-height: 300px;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+}

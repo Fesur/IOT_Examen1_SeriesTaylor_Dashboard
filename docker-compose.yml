@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  series_app:
+    build: .
+    ports:
+      - "5000:5000"  # Dashboard web
+      - "5555:5555"  # Servidor de cálculos
+    volumes:
+      - ./series_math.db:/app/series_math.db  # Persistencia de la base de datos
+    environment:
+      - FLASK_DEBUG=0
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
