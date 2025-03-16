@@ -10,7 +10,7 @@ class Database:
         
     def init_db(self):
         """Inicializa la base de datos con las tablas necesarias."""
-        self.conn = sqlite3.connect(self.db_name)
+        self.conn = sqlite3.connect(self.db_name, check_same_thread=False)
         cursor = self.conn.cursor()
         
         # Tabla de usuarios
